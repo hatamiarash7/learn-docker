@@ -1,0 +1,145 @@
+# ===========================================
+# Full Stack Application
+# ===========================================
+# A complete application with:
+# - Nginx (reverse proxy)
+# - Node.js API
+# - MariaDB database
+# - Redis cache
+# - Adminer (database admin)
+# ===========================================
+
+services:
+  # ===========================================
+  # Nginx Reverse Proxy
+  # ===========================================
+  nginx:
+    image: nginx:alpine
+    container_name: nginx
+    ports:
+      - "${HTTP_PORT:-80}:80"
+    volumes:
+      # Nginx configuration
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+      # Static files
+      - ./nginx/html:/usr/share/nginx/html:ro
+    networks:
+      - frontend
+    depends_on:
+      api:
+        condition: service_healthy
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "wget", "-q", "--spider", "http://localhost/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # ===========================================
+  # Node.js API
+  # ===========================================
+  api:
+    build:
+      context: ./api
+      dockerfile: Dockerfile
+    container_name: api
+    environment:
+      - NODE_ENV=${NODE_ENV:-production}
+      - DB_HOST=db
+      - DB_PORT=3306
+      - DB_NAME=${DB_NAME}
+      - DB_USER=${DB_USER}
+      - DB_PASSWORD=${DB_PASSWORD}
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+    networks:
+      - frontend
+      - backend
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "wget", "-q", "--spider", "http://localhost:3000/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+
+  # ===========================================
+  # MariaDB Database
+  # ===========================================
+  db:
+    image: mariadb:${MARIADB_VERSION:-latest}
+    container_name: db
+    environment:
+      - MARIADB_ROOT_PASSWORD=${DB_ROOT_PASSWORD}
+      - MARIADB_DATABASE=${DB_NAME}
+      - MARIADB_USER=${DB_USER}
+      - MARIADB_PASSWORD=${DB_PASSWORD}
+    volumes:
+      - db-data:/var/lib/mysql
+      - ./db/init:/docker-entrypoint-initdb.d:ro
+    networks:
+      - backend
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "healthcheck.sh", "--connect", "--innodb_initialized"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 30s
+
+  # ===========================================
+  # Redis Cache
+  # ===========================================
+  redis:
+    image: redis:alpine
+    container_name: redis
+    command: redis-server --appendonly yes
+    volumes:
+      - redis-data:/data
+    networks:
+      - backend
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+
+  # ===========================================
+  # Adminer (Database Admin)
+  # ===========================================
+  adminer:
+    image: adminer:latest
+    container_name: adminer
+    ports:
+      - "${ADMINER_PORT:-8081}:8080"
+    environment:
+      - ADMINER_DEFAULT_SERVER=db
+    networks:
+      - backend
+    depends_on:
+      db:
+        condition: service_healthy
+    restart: unless-stopped
+
+# ===========================================
+# Networks
+# ===========================================
+networks:
+  frontend:
+    driver: bridge
+  backend:
+    driver: bridge
+    internal: true # No external access
+
+# ===========================================
+# Volumes
+# ===========================================
+volumes:
+  db-data:
+  redis-data:

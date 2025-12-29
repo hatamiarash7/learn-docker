@@ -1,0 +1,32 @@
+# ===========================================
+# ENTRYPOINT Wrapper Script Example
+# ===========================================
+# A common pattern: use ENTRYPOINT for a
+# wrapper script that does initialization,
+# then runs the actual command from CMD.
+# ===========================================
+
+FROM alpine:3.18
+
+LABEL example="ENTRYPOINT wrapper"
+
+# Copy the entrypoint wrapper script
+COPY entrypoint.sh /entrypoint.sh
+
+# Make it executable
+RUN chmod +x /entrypoint.sh
+
+# ENTRYPOINT runs the wrapper script
+ENTRYPOINT ["/entrypoint.sh"]
+
+# CMD provides the default command to run
+# This is passed to the entrypoint script as "$@"
+CMD ["echo", "Hello from the wrapper pattern!"]
+
+# Running: docker run image
+# Executes: /entrypoint.sh echo "Hello from the wrapper pattern!"
+# (entrypoint.sh does setup, then runs: echo "Hello from the wrapper pattern!")
+
+# Running: docker run image cat /etc/os-release
+# Executes: /entrypoint.sh cat /etc/os-release
+# (entrypoint.sh does setup, then runs: cat /etc/os-release)

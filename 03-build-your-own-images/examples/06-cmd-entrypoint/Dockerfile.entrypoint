@@ -1,0 +1,23 @@
+# ===========================================
+# ENTRYPOINT Only Example
+# ===========================================
+# ENTRYPOINT defines the main executable.
+# Runtime arguments are APPENDED to it.
+# ===========================================
+
+FROM alpine:3.18
+
+LABEL example="ENTRYPOINT only"
+
+# ENTRYPOINT defines the executable
+# Any arguments passed at runtime are appended
+# Format: ENTRYPOINT ["executable", "arg1"] (exec form - preferred)
+# Or:     ENTRYPOINT command arg1 (shell form)
+
+ENTRYPOINT ["echo"]
+
+# Running: docker run image "Hello"
+# Executes: echo Hello
+
+# Running: docker run image arg1 arg2
+# Executes: echo arg1 arg2

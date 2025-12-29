@@ -1,0 +1,113 @@
+# ===========================================
+# Multi-Service Networking Example
+# ===========================================
+# This demonstrates proper network isolation
+# between frontend and backend services.
+# ===========================================
+
+services:
+  # ===========================================
+  # Frontend Services
+  # ===========================================
+
+  # Web server (Nginx)
+  # Only on frontend network - can reach API
+  web:
+    image: nginx:alpine
+    container_name: web
+    ports:
+      - "8080:80"
+    volumes:
+      - ./nginx/html:/usr/share/nginx/html:ro
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+    networks:
+      - frontend
+    depends_on:
+      - api
+    restart: unless-stopped
+
+  # ===========================================
+  # API Layer
+  # ===========================================
+
+  # API service (Alpine with simple server)
+  # Connected to BOTH networks - bridges frontend and backend
+  api:
+    image: alpine:3.18
+    container_name: api
+    command: |
+      sh -c '
+        # Install required packages
+        apk add --no-cache curl
+        
+        # Simple HTTP server using shell
+        while true; do
+          echo -e "HTTP/1.1 200 OK\r\nContent-Type: application/json\r\n\r\n{\"status\": \"ok\", \"service\": \"api\", \"timestamp\": \"$(date -Iseconds)\"}" | nc -l -p 3000 -q 1
+        done
+      '
+    ports:
+      - "3000:3000"
+    networks:
+      - frontend
+      - backend
+    depends_on:
+      - db
+    restart: unless-stopped
+
+  # ===========================================
+  # Backend Services
+  # ===========================================
+
+  # Redis database
+  # Only on backend network - not accessible from frontend
+  db:
+    image: redis:alpine
+    container_name: db
+    # No ports exposed to host - internal only
+    networks:
+      - backend
+    volumes:
+      - redis-data:/data
+    restart: unless-stopped
+    # Health check for Redis
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+
+  # Adminer for database administration
+  # Only on backend network - can access db
+  adminer:
+    image: adminer:latest
+    container_name: adminer
+    ports:
+      - "8081:8080"
+    networks:
+      - backend
+    restart: unless-stopped
+
+# ===========================================
+# Networks
+# ===========================================
+networks:
+  # Frontend network for web-facing services
+  frontend:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.20.0.0/24
+
+  # Backend network for internal services
+  backend:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.21.0.0/24
+
+# ===========================================
+# Volumes
+# ===========================================
+volumes:
+  redis-data:
+    driver: local

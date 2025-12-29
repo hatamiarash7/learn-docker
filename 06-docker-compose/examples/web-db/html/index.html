@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Web + Database Demo</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        h1 {
+            color: #0db7ed;
+        }
+
+        .service {
+            background: #f8f9fa;
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 5px;
+            border-left: 4px solid #0db7ed;
+        }
+
+        .service h3 {
+            margin-top: 0;
+        }
+
+        a {
+            color: #0db7ed;
+            text-decoration: none;
+        }
+
+        a:hover {
+            text-decoration: underline;
+        }
+
+        code {
+            background: #e9ecef;
+            padding: 2px 6px;
+            border-radius: 3px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h1>🐳 Web + Database Demo</h1>
+        <p>This application demonstrates a web server with a database backend.</p>
+
+        <h2>Services</h2>
+
+        <div class="service">
+            <h3>🌐 Web Server (Nginx)</h3>
+            <p>You're viewing this page!</p>
+            <p>URL: <a href="http://localhost:8080">http://localhost:8080</a></p>
+        </div>
+
+        <div class="service">
+            <h3>🗄️ Database Admin (Adminer)</h3>
+            <p>Manage your MariaDB database.</p>
+            <p>URL: <a href="http://localhost:8081" target="_blank">http://localhost:8081</a></p>
+            <p>Connection: Server=<code>db</code>, User=<code>appuser</code></p>
+        </div>
+
+        <div class="service">
+            <h3>💾 Database (MariaDB)</h3>
+            <p>MariaDB database with persistent storage.</p>
+            <p>Internal hostname: <code>db</code></p>
+        </div>
+
+        <h2>Quick Commands</h2>
+        <ul>
+            <li>View logs: <code>docker-compose logs -f</code></li>
+            <li>Stop: <code>docker-compose down</code></li>
+            <li>Reset database: <code>docker-compose down -v</code></li>
+        </ul>
+    </div>
+</body>
+
+</html>

@@ -1,0 +1,88 @@
+# ===========================================
+# Health Checks and Dependencies Example
+# ===========================================
+# Demonstrates proper startup order using
+# health checks and depends_on conditions.
+# ===========================================
+
+services:
+  # ===========================================
+  # Web Server - Depends on API being healthy
+  # ===========================================
+  web:
+    image: nginx:alpine
+    container_name: healthcheck-web
+    ports:
+      - "8080:80"
+    volumes:
+      - ./nginx/html:/usr/share/nginx/html:ro
+    depends_on:
+      api:
+        # Wait for API to be healthy, not just started
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "wget", "-q", "--spider", "http://localhost/"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+    restart: unless-stopped
+
+  # ===========================================
+  # API Server - Depends on DB and Redis
+  # ===========================================
+  api:
+    build: ./api
+    container_name: healthcheck-api
+    environment:
+      - DB_HOST=db
+      - REDIS_HOST=redis
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "wget", "-q", "--spider", "http://localhost:3000/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      # Grace period for application startup
+      start_period: 10s
+    restart: unless-stopped
+
+  # ===========================================
+  # MariaDB - Has built-in health check
+  # ===========================================
+  db:
+    image: mariadb:latest
+    container_name: healthcheck-db
+    environment:
+      - MARIADB_ROOT_PASSWORD=secret
+      - MARIADB_DATABASE=app
+    volumes:
+      - db-data:/var/lib/mysql
+    healthcheck:
+      # MariaDB provides a healthcheck script
+      test: ["CMD", "healthcheck.sh", "--connect", "--innodb_initialized"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      # MariaDB needs time to initialize
+      start_period: 30s
+    restart: unless-stopped
+
+  # ===========================================
+  # Redis - Simple ping health check
+  # ===========================================
+  redis:
+    image: redis:alpine
+    container_name: healthcheck-redis
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+    restart: unless-stopped
+
+volumes:
+  db-data:

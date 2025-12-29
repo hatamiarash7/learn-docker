@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Multi-Service Network Demo</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        h1 {
+            color: #0db7ed;
+        }
+
+        .service {
+            background: #f8f9fa;
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 5px;
+            border-left: 4px solid #0db7ed;
+        }
+
+        .network-diagram {
+            background: #1a1a2e;
+            color: #00ff00;
+            padding: 20px;
+            border-radius: 5px;
+            font-family: monospace;
+            white-space: pre;
+            overflow-x: auto;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h1>🌐 Multi-Service Network Demo</h1>
+
+        <p>This demonstrates Docker networking with multiple services.</p>
+
+        <h2>Services</h2>
+
+        <div class="service">
+            <strong>Web (Nginx)</strong> - Port 8080<br>
+            Frontend web server, connected to frontend network only.
+        </div>
+
+        <div class="service">
+            <strong>API</strong> - Port 3000<br>
+            API server, connected to both frontend and backend networks.
+        </div>
+
+        <div class="service">
+            <strong>Database (Redis)</strong> - Internal only<br>
+            Redis database, connected to backend network only.
+        </div>
+
+        <div class="service">
+            <strong>Adminer</strong> - Port 8081<br>
+            Database admin UI, connected to backend network.
+        </div>
+
+        <h2>Network Isolation</h2>
+
+        <div class="network-diagram">
+            ┌────────────── Frontend Network ──────────────┐
+            │ │
+            │ [Web] ◄────────────────────► [API] │
+            │ │ │
+            └───────────────────────────────────┼──────────┘
+            │
+            ┌───────────────────────────────────┼──────────┐
+            │ │ │
+            │ [Adminer] ◄──► [API] ◄──────► [DB] │
+            │ │
+            └────────────── Backend Network ───────────────┘
+        </div>
+    </div>
+</body>
+
+</html>

@@ -1,0 +1,4 @@
+# Python dependencies for Flask application
+# Pin versions for reproducible builds
+
+flask==3.0.0

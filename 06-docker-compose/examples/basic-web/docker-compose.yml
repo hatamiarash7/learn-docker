@@ -1,0 +1,30 @@
+# ===========================================
+# Basic Web Server - Docker Compose Example
+# ===========================================
+# The simplest Compose file: a single service
+# serving static HTML with Nginx.
+# ===========================================
+
+services:
+  # Web server service
+  web:
+    # Use official Nginx Alpine image (small and fast)
+    image: nginx:alpine
+
+    # Map port 8080 on host to port 80 in container
+    ports:
+      - "8080:80"
+
+    # Mount local HTML directory (read-only for security)
+    volumes:
+      - ./html:/usr/share/nginx/html:ro
+
+    # Restart policy - restart unless manually stopped
+    restart: unless-stopped
+
+    # Health check to verify Nginx is responding
+    healthcheck:
+      test: ["CMD", "wget", "-q", "--spider", "http://localhost/"]
+      interval: 30s
+      timeout: 10s
+      retries: 3

@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Health Check Demo</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        h1 {
+            color: #0db7ed;
+        }
+
+        .service {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px;
+            margin: 10px 0;
+            background: #f8f9fa;
+            border-radius: 5px;
+        }
+
+        .status {
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+        }
+
+        .healthy {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .unhealthy {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        .checking {
+            background: #fff3cd;
+            color: #856404;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h1>🏥 Health Check Demo</h1>
+        <p>Monitoring service health with Docker Compose</p>
+
+        <h2>Service Status</h2>
+
+        <div class="service">
+            <span><strong>🌐 Web</strong> (nginx)</span>
+            <span class="status healthy">Healthy</span>
+        </div>
+
+        <div class="service">
+            <span><strong>⚡ API</strong> (flask)</span>
+            <span class="status checking" id="api-status">Checking...</span>
+        </div>
+
+        <div class="service">
+            <span><strong>🗄️ Database</strong> (mariadb)</span>
+            <span class="status checking" id="db-status">Checking...</span>
+        </div>
+
+        <div class="service">
+            <span><strong>💾 Redis</strong> (cache)</span>
+            <span class="status checking" id="redis-status">Checking...</span>
+        </div>
+
+        <p style="margin-top: 20px; color: #666;">
+            Status updates every 5 seconds
+        </p>
+    </div>
+
+    <script>
+        async function checkHealth() {
+            try {
+                const response = await fetch('/api/health');
+                const data = await response.json();
+
+                document.getElementById('api-status').textContent =
+                    data.status === 'healthy' ? 'Healthy' : 'Unhealthy';
+                document.getElementById('api-status').className =
+                    'status ' + (data.status === 'healthy' ? 'healthy' : 'unhealthy');
+
+                document.getElementById('db-status').textContent =
+                    data.database === 'connected' ? 'Connected' : 'Disconnected';
+                document.getElementById('db-status').className =
+                    'status ' + (data.database === 'connected' ? 'healthy' : 'unhealthy');
+
+                document.getElementById('redis-status').textContent =
+                    data.cache === 'connected' ? 'Connected' : 'Disconnected';
+                document.getElementById('redis-status').className =
+                    'status ' + (data.cache === 'connected' ? 'healthy' : 'unhealthy');
+            } catch (error) {
+                document.getElementById('api-status').textContent = 'Unhealthy';
+                document.getElementById('api-status').className = 'status unhealthy';
+            }
+        }
+
+        // Check immediately and every 5 seconds
+        checkHealth();
+        setInterval(checkHealth, 5000);
+    </script>
+</body>
+
+</html>
