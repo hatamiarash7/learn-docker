@@ -253,3 +253,5 @@ You can submit your solutions via a Pull Request
 
 1. Create a new directory under `tasks/1/solutions/` named with your name and place all your files there.
 2. Open a Pull Request against the main repository.
+
+**Note:** You can deliver your solution later if you don't know anything about git yet.
