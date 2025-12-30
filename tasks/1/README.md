@@ -178,6 +178,17 @@ Write a Bash script that:
 - Prints their names
 - Stops them automatically
 
+### Task 3: Resource Usage Summary
+
+Write a script that:
+
+1. Lists all running containers with their resource usage
+2. Outputs:
+
+   ```text
+   NAME | CPU% | MEM%
+   ```
+
 ## Part 5 – Python Automation
 
 ### Task 1: Container Age Analyzer
