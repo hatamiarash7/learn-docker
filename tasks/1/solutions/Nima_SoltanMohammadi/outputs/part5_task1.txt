@@ -1,0 +1,8 @@
+NAME | AGE_SECONDS | IMAGE | tier
+------------------------------------------------------------
+producer-1 | 439 | log-producer:1.0 | backend
+producer-2 | 424 | log-producer:1.0 | backend
+producer-3 | 408 | log-producer:1.0 | backend
+worker-1 | 393 | cpu-worker:latest | worker
+worker-2 | 378 | cpu-worker:latest | worker
+toolbox-1 | 362 | toolbox:latest | utility

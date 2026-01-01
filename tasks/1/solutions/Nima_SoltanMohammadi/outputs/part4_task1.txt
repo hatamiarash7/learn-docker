@@ -1,0 +1,8 @@
+CONTAINER_NAME | IMAGE | app | tier | start_time
+-----------------------------------------------------------
+toolbox-1 | toolbox:latest | toolbox | utility | 2026-01-01T23:09:53.076855207Z
+worker-2 | cpu-worker:latest | cpu-worker | worker | 2026-01-01T23:09:37.790244056Z
+worker-1 | cpu-worker:latest | cpu-worker | worker | 2026-01-01T23:09:22.495150987Z
+producer-3 | log-producer:1.0 | log-producer | backend | 2026-01-01T23:09:07.197294753Z
+producer-2 | log-producer:1.0 | log-producer | backend | 2026-01-01T23:08:51.887520235Z
+producer-1 | log-producer:1.0 | log-producer | backend | 2026-01-01T23:08:36.523932731Z

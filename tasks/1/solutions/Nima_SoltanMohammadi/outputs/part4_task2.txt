@@ -1,0 +1,3 @@
+Checking containers for env != training...
+
+Policy enforcement complete.

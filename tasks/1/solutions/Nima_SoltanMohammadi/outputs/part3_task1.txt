@@ -1,0 +1,3 @@
+NAMES      IMAGE               STATUS
+worker-2   cpu-worker:latest   Up About a minute
+worker-1   cpu-worker:latest   Up About a minute

@@ -1,0 +1,7 @@
+FROM alpine
+
+LABEL app=log-producer
+LABEL tier=backend
+LABEL env=training
+
+CMD while true; do echo "[INFO] producer alive $(date)"; sleep 3; done

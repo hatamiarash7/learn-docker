@@ -1,0 +1,4 @@
+NAMES        IMAGE              STATUS
+producer-3   log-producer:1.0   Up 3 minutes
+producer-2   log-producer:1.0   Up 3 minutes
+producer-1   log-producer:1.0   Up 4 minutes

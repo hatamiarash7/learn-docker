@@ -1,0 +1,7 @@
+NAMES        IMAGE               STATUS
+toolbox-1    toolbox:latest      Up About a minute
+worker-2     cpu-worker:latest   Up About a minute
+worker-1     cpu-worker:latest   Up 2 minutes
+producer-3   log-producer:1.0    Up 2 minutes
+producer-2   log-producer:1.0    Up 2 minutes
+producer-1   log-producer:1.0    Up 2 minutes
