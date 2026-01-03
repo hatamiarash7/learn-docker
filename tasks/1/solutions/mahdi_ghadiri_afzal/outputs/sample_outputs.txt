@@ -1,0 +1,138 @@
+=== DOCKER TASK 1 - SAMPLE OUTPUTS ===
+Date: 2026-01-03
+Author: Mahdi Ghadiri Afzal
+
+================================================================================
+PART 3: ADVANCED DOCKER PS FILTERING
+================================================================================
+
+Task 1: Containers with label tier=worker
+-------------------------------------------
+NAMES      IMAGE               STATUS
+worker-2   cpu-worker:latest   Up 25 seconds
+worker-1   cpu-worker:latest   Up 40 seconds
+
+Task 2: Containers started in last 2 minutes
+---------------------------------------------
+NAMES          IMAGE                      STATUS
+toolbox-1      toolbox:latest             Up 9 seconds
+worker-2       cpu-worker:latest          Up 25 seconds
+worker-1       cpu-worker:latest          Up 40 seconds
+producer-3     log-producer:1.0           Up 55 seconds
+producer-2     log-producer:1.0           Up About a minute
+producer-1     log-producer:1.0           Up About a minute
+
+Task 3: Custom format (NAME | IMAGE | STATUS)
+----------------------------------------------
+toolbox-1 | toolbox:latest | Up 9 seconds
+worker-2 | cpu-worker:latest | Up 25 seconds
+worker-1 | cpu-worker:latest | Up 40 seconds
+producer-3 | log-producer:1.0 | Up 55 seconds
+producer-2 | log-producer:1.0 | Up About a minute
+producer-1 | log-producer:1.0 | Up About a minute
+
+Task 4: Container IDs of log-producer
+--------------------------------------
+90364567c7db
+a8a03a488cd5
+8730850119eb
+
+Task 5: Containers matching producer-*
+---------------------------------------
+NAMES          IMAGE                      STATUS
+producer-3     log-producer:1.0           Up 55 seconds
+producer-2     log-producer:1.0           Up About a minute
+producer-1     log-producer:1.0           Up About a minute
+
+================================================================================
+PART 4: BASH AUTOMATION WITH DOCKER INSPECT
+================================================================================
+
+Task 1: Container Metadata Report
+----------------------------------
+CONTAINER_NAME | IMAGE | app | tier | start_time
+-------------------------------------------------
+toolbox-1 | toolbox:latest | toolbox | utility | 2026-01-03T11:52:01.414830531Z
+worker-2 | cpu-worker:latest | cpu-worker | worker | 2026-01-03T11:51:46.271816224Z
+worker-1 | cpu-worker:latest | cpu-worker | worker | 2026-01-03T11:51:31.120892456Z
+producer-3 | log-producer:1.0 | log-producer | backend | 2026-01-03T11:51:15.943214591Z
+producer-2 | log-producer:1.0 | log-producer | backend | 2026-01-03T11:51:00.7964281Z
+producer-1 | log-producer:1.0 | log-producer | backend | 2026-01-03T11:50:45.64838471Z
+
+Task 2: Policy Enforcement
+---------------------------
+✓ All containers have env=training
+
+Task 3: Resource Usage Summary
+-------------------------------
+NAME | CPU% | MEM%
+-------------------
+toolbox-1 | 0.01% | 0.00%
+worker-2 | 0.00% | 0.00%
+worker-1 | 0.45% | 0.00%
+producer-3 | 0.11% | 0.00%
+producer-2 | 0.18% | 0.00%
+producer-1 | 0.20% | 0.00%
+
+================================================================================
+PART 5: PYTHON AUTOMATION
+================================================================================
+
+Task 1: Container Age Analyzer
+-------------------------------
+NAME | AGE_SECONDS | IMAGE | tier
+------------------------------------------------------------
+producer-1 | 153 | log-producer:1.0 | backend
+producer-2 | 138 | log-producer:1.0 | backend
+producer-3 | 123 | log-producer:1.0 | backend
+worker-1 | 107 | cpu-worker:latest | worker
+worker-2 | 92 | cpu-worker:latest | worker
+toolbox-1 | 77 | toolbox:latest | utility
+
+Task 2: Image Usage Detector
+-----------------------------
+Unused Images:
+----------------------------------------
+alpine:latest -> UNUSED
+nginx:latest -> UNUSED
+postgres:16 -> UNUSED
+redis:7-alpine -> UNUSED
+[... and 52 more unused images]
+
+Total unused: 56
+
+================================================================================
+PART 6: BONUS - SMART WORKER CONTROLLER
+================================================================================
+
+Container: worker-2
+  Uptime: 1 minutes
+  Action: OK
+
+Container: worker-1
+  Uptime: 2 minutes
+  Action: OK
+
+✓ Check complete
+
+================================================================================
+ADDITIONAL TEST: TOOLBOX INFO SCRIPT
+================================================================================
+
+$ docker exec toolbox-1 python3 /opt/info.py
+
+Container information
+---------------------
+
+Hostname        : c13bd68958d7
+Container ID    : c13bd68958d7
+Current time    : 2026-01-03 11:52:15
+
+OS Environment variables:
+  HOME=/root
+  HOSTNAME=c13bd68958d7
+  PATH=/usr/local/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+  PWD=/
+  PYTHON_VERSION=3.13.1
+  [... more environment variables]
+
