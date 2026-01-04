@@ -1,0 +1,16 @@
+FROM alpine:latest
+
+LABEL app=cpu-worker
+LABEL tier=worker
+LABEL env=training
+
+RUN echo '#!/bin/sh' > /usr/local/bin/worker.sh && \
+    echo 'while true; do' >> /usr/local/bin/worker.sh && \
+    echo '  for i in $(seq 1 1000); do' >> /usr/local/bin/worker.sh && \
+    echo '    echo $((i * i)) > /dev/null' >> /usr/local/bin/worker.sh && \
+    echo '  done' >> /usr/local/bin/worker.sh && \
+    echo '  sleep 2' >> /usr/local/bin/worker.sh && \
+    echo 'done' >> /usr/local/bin/worker.sh && \
+    chmod +x /usr/local/bin/worker.sh
+
+CMD ["/usr/local/bin/worker.sh"]

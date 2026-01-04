@@ -1,0 +1,14 @@
+FROM alpine:latest
+
+LABEL app=log-producer
+LABEL tier=backend
+LABEL env=training
+
+RUN echo '#!/bin/sh' > /usr/local/bin/producer.sh && \
+    echo 'while true; do' >> /usr/local/bin/producer.sh && \
+    echo '  echo "[INFO] producer alive $(date)"' >> /usr/local/bin/producer.sh && \
+    echo '  sleep 3' >> /usr/local/bin/producer.sh && \
+    echo 'done' >> /usr/local/bin/producer.sh && \
+    chmod +x /usr/local/bin/producer.sh
+
+CMD ["/usr/local/bin/producer.sh"]
