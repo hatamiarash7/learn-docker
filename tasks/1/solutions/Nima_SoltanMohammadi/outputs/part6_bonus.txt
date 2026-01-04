@@ -1,0 +1,13 @@
+Smart Worker Controller - Checking cpu-worker uptime...
+
+Container: worker-2
+  Uptime: 486 seconds
+  Action: RESTARTING (uptime > 5 minutes)
+worker-2
+
+Container: worker-1
+  Uptime: 511 seconds
+  Action: RESTARTING (uptime > 5 minutes)
+worker-1
+
+Worker controller check complete.

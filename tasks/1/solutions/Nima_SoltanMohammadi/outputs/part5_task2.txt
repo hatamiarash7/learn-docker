@@ -1,0 +1,13 @@
+Image Usage Report
+------------------------------------------------------------
+toolbox:latest -> IN USE
+my-first-app:v1 -> UNUSED
+nginx:alpine -> UNUSED
+log-producer:1.0 -> IN USE
+log-producer:stable -> UNUSED
+cpu-worker:latest -> IN USE
+alpine:latest -> UNUSED
+nginx:latest -> UNUSED
+redis:alpine -> UNUSED
+hello-world:latest -> UNUSED
+busybox:latest -> UNUSED

@@ -1,0 +1,10 @@
+FROM python:3.13-slim
+
+LABEL app=toolbox
+LABEL tier=utility
+LABEL env=training
+
+COPY dockerfiles/info.py /opt/info.py
+RUN chmod +x /opt/info.py
+
+CMD ["python3"]
