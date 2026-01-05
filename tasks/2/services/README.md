@@ -4,14 +4,14 @@ This directory contains all the microservices for the ShopStream e-commerce plat
 
 ## Services Overview
 
-| Service | Language | Port | Description |
-|---------|----------|------|-------------|
-| **frontend** | Static HTML/JS | 80 | Vue.js-like SPA served by Nginx |
-| **api-gateway** | Node.js | 3000 | Central API gateway with rate limiting |
-| **auth-service** | Python/Flask | 5000 | User authentication and JWT tokens |
-| **product-service** | Node.js | 3000 | Product catalog with Elasticsearch |
-| **order-service** | Python/Flask | 5000 | Order processing with RabbitMQ |
-| **notification-service** | Node.js | 3000 | WebSocket real-time notifications |
+| Service                  | Language       | Port | Description                            |
+| ------------------------ | -------------- | ---- | -------------------------------------- |
+| **frontend**             | Static HTML/JS | 80   | Vue.js-like SPA served by Nginx        |
+| **api-gateway**          | Node.js        | 3000 | Central API gateway with rate limiting |
+| **auth-service**         | Python/Flask   | 5000 | User authentication and JWT tokens     |
+| **product-service**      | Node.js        | 3000 | Product catalog with Elasticsearch     |
+| **order-service**        | Python/Flask   | 5000 | Order processing with RabbitMQ         |
+| **notification-service** | Node.js        | 3000 | WebSocket real-time notifications      |
 
 ## Directory Structure
 
