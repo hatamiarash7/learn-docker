@@ -1,0 +1,27 @@
+# Static files
+*.map
+*.ts
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+
+# Docker
+Dockerfile.dev
+
+# Git
+.git/
+.gitignore
+
+# Documentation
+README.md
+docs/

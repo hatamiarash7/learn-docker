@@ -1,0 +1,143 @@
+# ============================================
+# Prometheus Configuration
+# ============================================
+# Scrape configuration for ShopStream services
+# ============================================
+
+global:
+  scrape_interval: 15s
+  evaluation_interval: 15s
+  external_labels:
+    cluster: "shopstream"
+    env: "production"
+
+# Alertmanager configuration
+alerting:
+  alertmanagers:
+    - static_configs:
+        - targets:
+          # - alertmanager:9093
+
+# Rule files
+rule_files:
+  # - "/etc/prometheus/rules/*.yml"
+
+# Scrape configurations
+scrape_configs:
+  # ============================================
+  # Prometheus self-monitoring
+  # ============================================
+  - job_name: "prometheus"
+    static_configs:
+      - targets: ["localhost:9090"]
+        labels:
+          service: "prometheus"
+
+  # ============================================
+  # Node Exporter
+  # ============================================
+  - job_name: "node-exporter"
+    dns_sd_configs:
+      - names:
+          - "tasks.node-exporter"
+        type: "A"
+        port: 9100
+    relabel_configs:
+      - source_labels: [__address__]
+        target_label: instance
+
+  # ============================================
+  # Docker Engine Metrics
+  # ============================================
+  - job_name: "docker"
+    dns_sd_configs:
+      - names:
+          - "tasks.cadvisor"
+        type: "A"
+        port: 8080
+
+  # ============================================
+  # Application Services
+  # ============================================
+  - job_name: "api-gateway"
+    dns_sd_configs:
+      - names:
+          - "tasks.api-gateway"
+        type: "A"
+        port: 3000
+    metrics_path: "/metrics"
+    scrape_interval: 10s
+
+  - job_name: "auth-service"
+    dns_sd_configs:
+      - names:
+          - "tasks.auth-service"
+        type: "A"
+        port: 5000
+    metrics_path: "/metrics"
+    scrape_interval: 10s
+
+  - job_name: "product-service"
+    dns_sd_configs:
+      - names:
+          - "tasks.product-service"
+        type: "A"
+        port: 3000
+    metrics_path: "/metrics"
+    scrape_interval: 10s
+
+  - job_name: "order-service"
+    dns_sd_configs:
+      - names:
+          - "tasks.order-service"
+        type: "A"
+        port: 5000
+    metrics_path: "/metrics"
+    scrape_interval: 10s
+
+  - job_name: "notification-service"
+    dns_sd_configs:
+      - names:
+          - "tasks.notification-service"
+        type: "A"
+        port: 3000
+    metrics_path: "/metrics"
+    scrape_interval: 10s
+
+  # ============================================
+  # Infrastructure Services
+  # ============================================
+  - job_name: "redis"
+    static_configs:
+      - targets: ["redis-exporter:9121"]
+        labels:
+          service: "redis"
+
+  - job_name: "mariadb"
+    static_configs:
+      - targets: ["mysql-exporter:9104"]
+        labels:
+          service: "mariadb"
+
+  - job_name: "rabbitmq"
+    static_configs:
+      - targets: ["rabbitmq:15692"]
+        labels:
+          service: "rabbitmq"
+    metrics_path: "/metrics"
+
+  - job_name: "elasticsearch"
+    static_configs:
+      - targets: ["elasticsearch-exporter:9114"]
+        labels:
+          service: "elasticsearch"
+
+  # ============================================
+  # Traefik (if used)
+  # ============================================
+  - job_name: "traefik"
+    static_configs:
+      - targets: ["traefik:8082"]
+        labels:
+          service: "traefik"
+    metrics_path: "/metrics"
