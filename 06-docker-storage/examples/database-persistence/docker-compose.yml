@@ -1,0 +1,69 @@
+# ============================================
+# Database Persistence Example
+# ============================================
+# This example demonstrates persistent database
+# storage using Docker volumes.
+#
+# Usage:
+#   docker compose up -d
+#   docker compose exec db mariadb -uroot -psecret
+#   docker compose down
+#   docker compose up -d  # Data persists!
+# ============================================
+
+services:
+  # --------------------------------------------
+  # MariaDB Database
+  # --------------------------------------------
+  db:
+    image: mariadb:latest
+    container_name: persistent-db
+    restart: unless-stopped
+    environment:
+      MARIADB_ROOT_PASSWORD: ${DB_ROOT_PASSWORD:-secret}
+      MARIADB_DATABASE: ${DB_NAME:-myapp}
+      MARIADB_USER: ${DB_USER:-appuser}
+      MARIADB_PASSWORD: ${DB_PASSWORD:-apppassword}
+    volumes:
+      # Named volume for database data
+      # This persists even when container is removed
+      - db-data:/var/lib/mysql
+
+      # Bind mount for initialization scripts
+      # Files are executed in alphabetical order on first run
+      - ./init:/docker-entrypoint-initdb.d:ro
+
+      # Custom configuration (optional)
+      # - ./config/my.cnf:/etc/mysql/conf.d/custom.cnf:ro
+    ports:
+      - "3306:3306"
+    healthcheck:
+      test: ["CMD", "healthcheck.sh", "--connect", "--innodb_initialized"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+
+  # --------------------------------------------
+  # Adminer (Database UI)
+  # --------------------------------------------
+  adminer:
+    image: adminer:latest
+    container_name: db-admin
+    restart: unless-stopped
+    ports:
+      - "8080:8080"
+    environment:
+      ADMINER_DEFAULT_SERVER: db
+    depends_on:
+      db:
+        condition: service_healthy
+
+# --------------------------------------------
+# Named Volumes
+# --------------------------------------------
+volumes:
+  db-data:
+    # Volume is managed by Docker
+    # Data location: /var/lib/docker/volumes/db-data/_data
+    name: ${COMPOSE_PROJECT_NAME:-database}_db-data

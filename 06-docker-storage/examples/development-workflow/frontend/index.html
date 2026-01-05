@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Development Workflow Demo</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .container {
+            background: white;
+            border-radius: 16px;
+            padding: 40px;
+            max-width: 600px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        }
+
+        h1 {
+            color: #333;
+            margin-bottom: 20px;
+        }
+
+        .info {
+            background: #f8f9fa;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+
+        .info h3 {
+            color: #667eea;
+            margin-bottom: 10px;
+        }
+
+        .info p {
+            color: #666;
+            line-height: 1.6;
+        }
+
+        .api-result {
+            background: #e8f5e9;
+            border-radius: 8px;
+            padding: 20px;
+            margin-top: 20px;
+        }
+
+        .api-result.error {
+            background: #ffebee;
+        }
+
+        button {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            margin-top: 20px;
+        }
+
+        button:hover {
+            background: #5a67d8;
+        }
+
+        code {
+            background: #f1f1f1;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-family: monospace;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h1>🐳 Development Workflow</h1>
+
+        <div class="info">
+            <h3>Live Reload Enabled!</h3>
+            <p>
+                Edit this file at <code>frontend/index.html</code> and
+                refresh your browser to see changes instantly.
+            </p>
+            <p>
+                The file is mounted into the container using a bind mount,
+                so no rebuild is needed!
+            </p>
+        </div>
+
+        <button onclick="callApi()">Test API Connection</button>
+
+        <div id="result" class="api-result" style="display: none;">
+            Loading...
+        </div>
+    </div>
+
+    <script>
+        async function callApi() {
+            const resultDiv = document.getElementById('result');
+            resultDiv.style.display = 'block';
+            resultDiv.className = 'api-result';
+            resultDiv.innerHTML = 'Loading...';
+
+            try {
+                const response = await fetch('/api/hello');
+                const data = await response.json();
+                resultDiv.innerHTML = `
+                    <strong>API Response:</strong><br>
+                    <code>${JSON.stringify(data, null, 2)}</code>
+                `;
+            } catch (error) {
+                resultDiv.className = 'api-result error';
+                resultDiv.innerHTML = `
+                    <strong>Error:</strong> ${error.message}<br>
+                    <small>Make sure the API service is running!</small>
+                `;
+            }
+        }
+    </script>
+</body>
+
+</html>

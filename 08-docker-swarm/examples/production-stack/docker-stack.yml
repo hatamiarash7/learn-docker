@@ -1,0 +1,313 @@
+# ============================================
+# Production-Ready Swarm Stack
+# ============================================
+# A complete production-like stack with:
+# - Nginx reverse proxy
+# - Node.js API
+# - MariaDB database
+# - Redis cache
+# - Prometheus monitoring
+# - Grafana dashboards
+#
+# Deploy:
+#   docker stack deploy -c docker-stack.yml production
+# ============================================
+
+version: "3.8"
+
+services:
+  # ============================================
+  # FRONTEND TIER
+  # ============================================
+
+  # Nginx Reverse Proxy / Load Balancer
+  nginx:
+    image: nginx:alpine
+    ports:
+      - "80:80"
+      - "443:443"
+    networks:
+      - frontend
+    configs:
+      - source: nginx_config
+        target: /etc/nginx/nginx.conf
+    deploy:
+      replicas: 2
+      update_config:
+        parallelism: 1
+        delay: 10s
+        order: start-first
+      resources:
+        limits:
+          cpus: "0.5"
+          memory: 128M
+    healthcheck:
+      test: ["CMD", "wget", "-q", "--spider", "http://localhost/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # ============================================
+  # APPLICATION TIER
+  # ============================================
+
+  # Node.js API
+  api:
+    image: node:20-alpine
+    networks:
+      - frontend
+      - backend
+    secrets:
+      - db_password
+      - redis_password
+    environment:
+      NODE_ENV: production
+      DB_HOST: db
+      DB_USER: appuser
+      DB_PASSWORD_FILE: /run/secrets/db_password
+      DB_NAME: production
+      REDIS_HOST: redis
+      REDIS_PASSWORD_FILE: /run/secrets/redis_password
+    deploy:
+      replicas: 4
+      update_config:
+        parallelism: 2
+        delay: 15s
+        failure_action: rollback
+        order: start-first
+      resources:
+        limits:
+          cpus: "1.0"
+          memory: 512M
+        reservations:
+          cpus: "0.5"
+          memory: 256M
+      placement:
+        constraints:
+          - node.role == worker
+    healthcheck:
+      test: ["CMD", "wget", "-q", "--spider", "http://localhost:3000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
+    command: |
+      sh -c '
+        echo "Starting API server..."
+        echo "const http = require(\"http\"); 
+        const server = http.createServer((req, res) => {
+          if (req.url === \"/health\") {
+            res.writeHead(200, {\"Content-Type\": \"application/json\"});
+            res.end(JSON.stringify({status: \"healthy\", timestamp: new Date().toISOString()}));
+          } else {
+            res.writeHead(200, {\"Content-Type\": \"application/json\"});
+            res.end(JSON.stringify({message: \"Hello from API\", hostname: require(\"os\").hostname()}));
+          }
+        });
+        server.listen(3000, () => console.log(\"API running on port 3000\"));" | node
+      '
+
+  # ============================================
+  # DATA TIER
+  # ============================================
+
+  # MariaDB Database
+  db:
+    image: mariadb:latest
+    networks:
+      - backend
+    secrets:
+      - db_root_password
+      - db_password
+    environment:
+      MARIADB_ROOT_PASSWORD_FILE: /run/secrets/db_root_password
+      MARIADB_DATABASE: production
+      MARIADB_USER: appuser
+      MARIADB_PASSWORD_FILE: /run/secrets/db_password
+    volumes:
+      - db-data:/var/lib/mysql
+    deploy:
+      replicas: 1
+      placement:
+        constraints:
+          - node.role == manager
+          - node.labels.db == true
+      resources:
+        limits:
+          cpus: "2.0"
+          memory: 2G
+        reservations:
+          cpus: "1.0"
+          memory: 1G
+    healthcheck:
+      test: ["CMD", "healthcheck.sh", "--connect", "--innodb_initialized"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 60s
+
+  # Redis Cache
+  redis:
+    image: redis:alpine
+    networks:
+      - backend
+    secrets:
+      - redis_password
+    command: |
+      sh -c 'redis-server --requirepass "$$(cat /run/secrets/redis_password)" --appendonly yes'
+    volumes:
+      - redis-data:/data
+    deploy:
+      replicas: 1
+      resources:
+        limits:
+          cpus: "0.5"
+          memory: 256M
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # ============================================
+  # MONITORING TIER
+  # ============================================
+
+  # Prometheus
+  prometheus:
+    image: prom/prometheus:latest
+    ports:
+      - "9090:9090"
+    networks:
+      - monitoring
+      - backend
+    configs:
+      - source: prometheus_config
+        target: /etc/prometheus/prometheus.yml
+    volumes:
+      - prometheus-data:/prometheus
+    deploy:
+      replicas: 1
+      placement:
+        constraints:
+          - node.role == manager
+      resources:
+        limits:
+          cpus: "0.5"
+          memory: 512M
+    command:
+      - "--config.file=/etc/prometheus/prometheus.yml"
+      - "--storage.tsdb.path=/prometheus"
+      - "--storage.tsdb.retention.time=15d"
+
+  # Grafana
+  grafana:
+    image: grafana/grafana:latest
+    ports:
+      - "3000:3000"
+    networks:
+      - monitoring
+    environment:
+      GF_SECURITY_ADMIN_PASSWORD__FILE: /run/secrets/grafana_password
+    secrets:
+      - grafana_password
+    volumes:
+      - grafana-data:/var/lib/grafana
+    deploy:
+      replicas: 1
+      placement:
+        constraints:
+          - node.role == manager
+      resources:
+        limits:
+          cpus: "0.5"
+          memory: 256M
+
+  # Node Exporter (system metrics)
+  node-exporter:
+    image: prom/node-exporter:latest
+    networks:
+      - monitoring
+    volumes:
+      - /proc:/host/proc:ro
+      - /sys:/host/sys:ro
+      - /:/rootfs:ro
+    command:
+      - "--path.procfs=/host/proc"
+      - "--path.sysfs=/host/sys"
+      - "--path.rootfs=/rootfs"
+    deploy:
+      mode: global # One per node
+      resources:
+        limits:
+          cpus: "0.1"
+          memory: 64M
+
+  # cAdvisor (container metrics)
+  cadvisor:
+    image: gcr.io/cadvisor/cadvisor:latest
+    networks:
+      - monitoring
+    volumes:
+      - /:/rootfs:ro
+      - /var/run:/var/run:ro
+      - /sys:/sys:ro
+      - /var/lib/docker/:/var/lib/docker:ro
+    deploy:
+      mode: global
+      resources:
+        limits:
+          cpus: "0.2"
+          memory: 128M
+
+# ============================================
+# NETWORKS
+# ============================================
+networks:
+  frontend:
+    driver: overlay
+    attachable: true
+
+  backend:
+    driver: overlay
+    internal: true # No external access
+    attachable: true
+
+  monitoring:
+    driver: overlay
+    attachable: true
+
+# ============================================
+# VOLUMES
+# ============================================
+volumes:
+  db-data:
+    driver: local
+  redis-data:
+    driver: local
+  prometheus-data:
+    driver: local
+  grafana-data:
+    driver: local
+
+# ============================================
+# CONFIGS
+# ============================================
+configs:
+  nginx_config:
+    file: ./nginx.conf
+  prometheus_config:
+    file: ./prometheus.yml
+
+# ============================================
+# SECRETS (must be created before deployment)
+# ============================================
+secrets:
+  db_root_password:
+    external: true
+  db_password:
+    external: true
+  redis_password:
+    external: true
+  grafana_password:
+    external: true

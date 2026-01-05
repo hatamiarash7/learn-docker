@@ -1,0 +1,85 @@
+# ============================================
+# Rolling Updates Demo
+# ============================================
+# Demonstrates zero-downtime deployments
+# with rolling updates and rollbacks.
+#
+# Deploy:
+#   docker stack deploy -c docker-stack.yml rollingupdates
+# ============================================
+
+version: "3.8"
+
+services:
+  # --------------------------------------------
+  # Web Application (demonstrates updates)
+  # --------------------------------------------
+  web:
+    image: nginx:1.24-alpine
+    ports:
+      - "80:80"
+    networks:
+      - webnet
+    deploy:
+      replicas: 6
+
+      # Rolling Update Configuration
+      update_config:
+        # Update 2 tasks at a time
+        parallelism: 2
+
+        # Wait 15 seconds between batches
+        delay: 15s
+
+        # Monitor new tasks for 10 seconds
+        monitor: 10s
+
+        # If >20% fail, rollback automatically
+        max_failure_ratio: 0.2
+
+        # On failure, rollback automatically
+        failure_action: rollback
+
+        # Start new container before stopping old
+        order: start-first
+
+      # Rollback Configuration
+      rollback_config:
+        parallelism: 2
+        delay: 5s
+        failure_action: pause
+        order: stop-first
+
+      # Restart policy
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 3
+
+    healthcheck:
+      test: ["CMD", "wget", "-q", "--spider", "http://localhost/"]
+      interval: 5s
+      timeout: 3s
+      retries: 3
+      start_period: 5s
+
+  # --------------------------------------------
+  # Visualizer (watch updates in real-time)
+  # --------------------------------------------
+  visualizer:
+    image: dockersamples/visualizer:latest
+    ports:
+      - "8080:8080"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+    networks:
+      - webnet
+    deploy:
+      replicas: 1
+      placement:
+        constraints:
+          - node.role == manager
+
+networks:
+  webnet:
+    driver: overlay

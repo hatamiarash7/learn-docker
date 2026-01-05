@@ -1,0 +1,83 @@
+# ============================================
+# Shared Volumes Between Containers
+# ============================================
+# This example demonstrates how multiple
+# containers can share data through volumes.
+#
+# Use cases:
+# - Log aggregation
+# - Data processing pipelines
+# - Content generation and serving
+# ============================================
+
+services:
+  # --------------------------------------------
+  # Producer: Generates data to shared volume
+  # --------------------------------------------
+  producer:
+    image: alpine:3.18
+    container_name: data-producer
+    volumes:
+      - shared-data:/data
+    command: |
+      sh -c '
+        echo "Producer starting..."
+        count=1
+        while true; do
+          timestamp=$$(date "+%Y-%m-%d %H:%M:%S")
+          message="[$$timestamp] Message #$$count from producer"
+          echo "$$message" >> /data/messages.log
+          echo "Produced: $$message"
+          count=$$((count + 1))
+          sleep 5
+        done
+      '
+
+  # --------------------------------------------
+  # Consumer: Reads data from shared volume
+  # --------------------------------------------
+  consumer:
+    image: alpine:3.18
+    container_name: data-consumer
+    volumes:
+      - shared-data:/data:ro # Read-only access
+    command: |
+      sh -c '
+        echo "Consumer starting..."
+        echo "Waiting for data..."
+        sleep 3
+        while true; do
+          if [ -f /data/messages.log ]; then
+            echo "=== Latest Messages ==="
+            tail -5 /data/messages.log
+            echo "======================"
+          else
+            echo "No messages yet..."
+          fi
+          sleep 5
+        done
+      '
+    depends_on:
+      - producer
+
+  # --------------------------------------------
+  # Web Server: Serves log file via HTTP
+  # --------------------------------------------
+  web:
+    image: nginx:alpine
+    container_name: log-viewer
+    ports:
+      - "8080:80"
+    volumes:
+      - shared-data:/usr/share/nginx/html:ro
+      - ./nginx.conf:/etc/nginx/conf.d/default.conf:ro
+    depends_on:
+      - producer
+
+# --------------------------------------------
+# Shared Volume
+# --------------------------------------------
+volumes:
+  shared-data:
+    # This volume is shared between all services
+    name: example-shared-data

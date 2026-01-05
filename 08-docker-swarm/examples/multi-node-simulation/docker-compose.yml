@@ -1,0 +1,145 @@
+# ============================================
+# Multi-Node Swarm Simulation
+# ============================================
+# Simulates a multi-node swarm using Docker-in-Docker.
+# This allows testing swarm features on a single machine.
+#
+# Start:
+#   docker compose up -d
+#
+# Note: This is for LEARNING/TESTING only.
+#       For production, use real VMs or physical machines.
+# ============================================
+
+version: "3.8"
+
+services:
+  # ============================================
+  # Manager Node 1 (Primary)
+  # ============================================
+  manager1:
+    image: docker:dind
+    container_name: swarm-manager1
+    privileged: true
+    hostname: manager1
+    environment:
+      DOCKER_TLS_CERTDIR: ""
+    ports:
+      - "2375:2375" # Docker API
+      - "9000:9000" # For visualizer
+    networks:
+      - swarm-net
+    volumes:
+      - manager1-data:/var/lib/docker
+    command:
+      [
+        "dockerd",
+        "--host=tcp://0.0.0.0:2375",
+        "--host=unix:///var/run/docker.sock",
+      ]
+
+  # ============================================
+  # Manager Node 2
+  # ============================================
+  manager2:
+    image: docker:dind
+    container_name: swarm-manager2
+    privileged: true
+    hostname: manager2
+    environment:
+      DOCKER_TLS_CERTDIR: ""
+    networks:
+      - swarm-net
+    volumes:
+      - manager2-data:/var/lib/docker
+    depends_on:
+      - manager1
+    command:
+      [
+        "dockerd",
+        "--host=tcp://0.0.0.0:2375",
+        "--host=unix:///var/run/docker.sock",
+      ]
+
+  # ============================================
+  # Worker Node 1
+  # ============================================
+  worker1:
+    image: docker:dind
+    container_name: swarm-worker1
+    privileged: true
+    hostname: worker1
+    environment:
+      DOCKER_TLS_CERTDIR: ""
+    networks:
+      - swarm-net
+    volumes:
+      - worker1-data:/var/lib/docker
+    depends_on:
+      - manager1
+    command:
+      [
+        "dockerd",
+        "--host=tcp://0.0.0.0:2375",
+        "--host=unix:///var/run/docker.sock",
+      ]
+
+  # ============================================
+  # Worker Node 2
+  # ============================================
+  worker2:
+    image: docker:dind
+    container_name: swarm-worker2
+    privileged: true
+    hostname: worker2
+    environment:
+      DOCKER_TLS_CERTDIR: ""
+    networks:
+      - swarm-net
+    volumes:
+      - worker2-data:/var/lib/docker
+    depends_on:
+      - manager1
+    command:
+      [
+        "dockerd",
+        "--host=tcp://0.0.0.0:2375",
+        "--host=unix:///var/run/docker.sock",
+      ]
+
+  # ============================================
+  # Worker Node 3
+  # ============================================
+  worker3:
+    image: docker:dind
+    container_name: swarm-worker3
+    privileged: true
+    hostname: worker3
+    environment:
+      DOCKER_TLS_CERTDIR: ""
+    networks:
+      - swarm-net
+    volumes:
+      - worker3-data:/var/lib/docker
+    depends_on:
+      - manager1
+    command:
+      [
+        "dockerd",
+        "--host=tcp://0.0.0.0:2375",
+        "--host=unix:///var/run/docker.sock",
+      ]
+
+networks:
+  swarm-net:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.28.0.0/16
+
+volumes:
+  manager1-data:
+  manager2-data:
+  worker1-data:
+  worker2-data:
+  worker3-data:

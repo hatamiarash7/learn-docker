@@ -8,14 +8,16 @@ A comprehensive, hands-on Docker learning course designed for practical classroo
 
 This course covers everything you need to know to work with Docker effectively:
 
-| Section                  | Topics                          |
-| ------------------------ | ------------------------------- |
-| 1. Starting with Docker  | Installation, first containers  |
-| 2. Docker Images         | Pull, push, tag, save/load      |
-| 3. Build Your Own Images | Dockerfiles, multi-stage builds |
-| 4. Managing Containers   | Lifecycle, logs, resources      |
-| 5. Networking            | Bridge, host, custom networks   |
-| 6. Docker Compose        | Multi-container applications    |
+| Section                  | Topics                                     |
+| ------------------------ | ------------------------------------------ |
+| 1. Starting with Docker  | Installation, first containers             |
+| 2. Docker Images         | Pull, push, tag, save/load                 |
+| 3. Build Your Own Images | Dockerfiles, multi-stage builds            |
+| 4. Managing Containers   | Lifecycle, logs, resources                 |
+| 5. Networking            | Bridge, host, custom networks              |
+| 6. Docker Compose        | Multi-container applications               |
+| 7. Storage & Volumes     | Volumes, bind mounts, persistence          |
+| 8. Docker Swarm          | Orchestration, services, stacks, secrets   |
 
 ---
 
@@ -41,14 +43,30 @@ learn-docker/
 │   ├── README.md                 # Networking concepts
 │   └── examples/
 │       └── multi-service/        # Multi-network example
-└── 06-docker-compose/
-    ├── README.md                 # Docker Compose guide
+├── 06-docker-compose/
+│   ├── README.md                 # Docker Compose guide
+│   └── examples/
+│       ├── basic-web/            # Simple web server
+│       ├── web-db/               # Web + database
+│       ├── full-stack/           # Complete application
+│       ├── scaling/              # Load balancing
+│       └── healthcheck/          # Health checks
+├── 07-docker-storage/
+│   ├── README.md                 # Storage and volumes guide
+│   └── examples/
+│       ├── backup-restore/       # Volume backup scripts
+│       ├── database-persistence/ # Persistent database
+│       ├── development-workflow/ # Bind mounts for dev
+│       └── shared-volumes/       # Shared data patterns
+└── 08-docker-swarm/
+    ├── README.md                 # Docker Swarm orchestration
     └── examples/
-        ├── basic-web/            # Simple web server
-        ├── web-db/               # Web + database
-        ├── full-stack/           # Complete application
-        ├── scaling/              # Load balancing
-        └── healthcheck/          # Health checks
+        ├── basic-service/        # Simple swarm service
+        ├── web-stack/            # Multi-service stack
+        ├── secrets-demo/         # Secrets management
+        ├── rolling-updates/      # Zero-downtime updates
+        ├── production-stack/     # Production-ready stack
+        └── multi-node-simulation/ # Swarm cluster simulation
 ```
 
 ## 🚀 Getting Started
@@ -127,7 +145,18 @@ learn-docker/
 - Port mapping strategies
 - Network isolation patterns
 
-### [6. Docker Compose](./06-docker-compose/README.md)
+### [6. Docker Storage & Volumes](./06-docker-storage/README.md)
+
+- Container storage fundamentals
+- Docker volumes (named, anonymous)
+- Bind mounts for development
+- tmpfs mounts for sensitive data
+- Volume drivers and plugins
+- Backup and restore strategies
+- Data persistence patterns
+- Shared data between containers
+
+### [7. Docker Compose](./07-docker-compose/README.md)
 
 - Introduction to Docker Compose
 - Writing docker-compose.yml files
@@ -137,13 +166,19 @@ learn-docker/
 - Environment variables and secrets
 - Health checks and dependencies
 
-### 7. Storage / Volumes (Coming Soon)
+### [8. Docker Swarm](./08-docker-swarm/README.md)
 
-...
-
-### 8. Swarm Mode & Orchestration (Coming Soon)
-
-...
+- Swarm mode architecture
+- Initializing and managing swarms
+- Services, replicas, and tasks
+- Stack deployments
+- Overlay networking
+- Secrets and configs management
+- Rolling updates and rollbacks
+- Scaling and load balancing
+- Health checks and placement constraints
+- Production best practices
+- Monitoring with Prometheus & Grafana
 
 ### 9. Final Project (Coming Soon)
 
@@ -180,6 +215,16 @@ docker-compose down             # Stop services
 docker-compose logs -f          # Follow logs
 docker-compose ps               # List services
 
+# Docker Swarm
+docker swarm init               # Initialize swarm
+docker node ls                  # List swarm nodes
+docker service create           # Create a service
+docker service ls               # List services
+docker service scale <svc>=N    # Scale service
+docker stack deploy -c file.yml # Deploy stack
+docker stack rm <name>          # Remove stack
+docker secret create            # Create secret
+
 # System
 docker system df                # Show disk usage
 docker system prune             # Clean up resources
@@ -212,6 +257,9 @@ Each section contains practical exercises marked with 🎯. Solutions are provid
 - **Full Stack** - Nginx + API + Database + Cache
 - **Scaling** - Load balanced application
 - **Health Checks** - Proper dependency management
+- **Volume Backup** - Data backup and restore scripts
+- **Production Swarm** - Complete production stack with monitoring
+- **Rolling Updates** - Zero-downtime deployments
 
 ## 🤝 Contributing
 

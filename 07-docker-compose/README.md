@@ -8,7 +8,7 @@ Master Docker Compose to orchestrate multi-container applications with ease.
     - [Why Use Docker Compose?](#why-use-docker-compose)
     - [Basic Workflow](#basic-workflow)
     - [Installing Docker Compose](#installing-docker-compose)
-  - [Writing a docker-compose.yml File](#writing-a-docker-composeyml-file)
+  - [Writing a `docker-compose.yml` File](#writing-a-docker-composeyml-file)
     - [Basic Structure](#basic-structure)
     - [Common Service Options](#common-service-options)
   - [Defining Services, Networks, and Volumes](#defining-services-networks-and-volumes)
@@ -27,15 +27,15 @@ Master Docker Compose to orchestrate multi-container applications with ease.
   - [Environment Variables in Compose](#environment-variables-in-compose)
     - [Methods to Set Environment Variables](#methods-to-set-environment-variables)
       - [1. Direct in compose file](#1-direct-in-compose-file)
-      - [2. From .env file](#2-from-env-file)
+      - [2. From `.env` file](#2-from-env-file)
       - [3. Shell environment interpolation](#3-shell-environment-interpolation)
-    - [.env File Example](#env-file-example)
+    - [`.env` File Example](#env-file-example)
     - [Using Variables in Compose](#using-variables-in-compose)
     - [Environment Variable Precedence](#environment-variable-precedence)
     - [Best Practices for Environment Variables](#best-practices-for-environment-variables)
   - [Healthchecks and depends\_on](#healthchecks-and-depends_on)
     - [Health Checks in Compose](#health-checks-in-compose)
-    - [depends\_on with Conditions](#depends_on-with-conditions)
+    - [`depends_on` with Conditions](#depends_on-with-conditions)
     - [Condition Options](#condition-options)
     - [Complete Example with Health Checks](#complete-example-with-health-checks)
   - [Exercises](#exercises)
@@ -52,7 +52,7 @@ Master Docker Compose to orchestrate multi-container applications with ease.
 
 ### What is Docker Compose?
 
-Docker Compose is a tool for defining and running multi-container Docker applications. With a single YAML file, you can:
+Docker Compose is a tool/plugin for defining and running multi-container Docker applications. With a single YAML file, you can:
 
 - Define all services in your application
 - Configure networks and volumes
@@ -63,7 +63,7 @@ Docker Compose is a tool for defining and running multi-container Docker applica
 
 | Without Compose                | With Compose               |
 | ------------------------------ | -------------------------- |
-| Multiple `docker run` commands | Single `docker-compose up` |
+| Multiple `docker run` commands | Single `docker compose up` |
 | Manual network creation        | Automatic network setup    |
 | Complex startup scripts        | Declarative YAML config    |
 | Difficult to share             | Easy to version control    |
@@ -72,17 +72,18 @@ Docker Compose is a tool for defining and running multi-container Docker applica
 
 ```bash
 # 1. Create docker-compose.yml
+
 # 2. Start the application
-docker-compose up -d
+docker compose up -d
 
 # 3. View status
-docker-compose ps
+docker compose ps
 
 # 4. View logs
-docker-compose logs
+docker compose logs
 
 # 5. Stop the application
-docker-compose down
+docker compose down
 ```
 
 ### Installing Docker Compose
@@ -100,7 +101,7 @@ sudo chmod +x /usr/local/bin/docker-compose
 docker-compose --version
 ```
 
-## Writing a docker-compose.yml File
+## Writing a `docker-compose.yml` File
 
 ### Basic Structure
 
@@ -241,7 +242,7 @@ services:
   
   # Database
   db:
-    image: postgres:15-alpine
+    image: postgres:alpine
     environment:
       - POSTGRES_PASSWORD=secret
     volumes:
@@ -318,85 +319,85 @@ volumes:
 
 ```bash
 # Start services (foreground)
-docker-compose up
+docker compose up
 
 # Start services (background/detached)
-docker-compose up -d
+docker compose up -d
 
 # Start specific services
-docker-compose up -d web api
+docker compose up -d web api
 
 # Build images before starting
-docker-compose up --build
+docker compose up --build
 
 # Force recreate containers
-docker-compose up --force-recreate
+docker compose up --force-recreate
 
 # Stop services
-docker-compose stop
+docker compose stop
 
 # Stop and remove containers, networks
-docker-compose down
+docker compose down
 
 # Also remove volumes
-docker-compose down -v
+docker compose down -v
 
 # Also remove images
-docker-compose down --rmi all
+docker compose down --rmi all
 ```
 
 ### Viewing Status
 
 ```bash
 # List running services
-docker-compose ps
+docker compose ps
 
 # List all services (including stopped)
-docker-compose ps -a
+docker compose ps -a
 
 # View logs
-docker-compose logs
+docker compose logs
 
 # Follow logs
-docker-compose logs -f
+docker compose logs -f
 
 # Logs for specific service
-docker-compose logs -f web
+docker compose logs -f web
 
 # Last N lines
-docker-compose logs --tail 100
+docker compose logs --tail 100
 ```
 
 ### Executing Commands
 
 ```bash
 # Run command in running container
-docker-compose exec web sh
+docker compose exec web sh
 
 # Run command in new container
-docker-compose run --rm web sh
+docker compose run --rm web sh
 
 # Run one-off command
-docker-compose run --rm api npm test
+docker compose run --rm api npm test
 ```
 
 ### Managing Services
 
 ```bash
 # Restart services
-docker-compose restart
+docker compose restart
 
 # Restart specific service
-docker-compose restart web
+docker compose restart web
 
 # Pull latest images
-docker-compose pull
+docker compose pull
 
 # Build/rebuild images
-docker-compose build
+docker compose build
 
 # Build without cache
-docker-compose build --no-cache
+docker compose build --no-cache
 ```
 
 ## Scaling Services
@@ -405,10 +406,10 @@ docker-compose build --no-cache
 
 ```bash
 # Scale a service to multiple replicas
-docker-compose up -d --scale web=3
+docker compose up -d --scale web=3
 
 # Scale multiple services
-docker-compose up -d --scale web=3 --scale worker=5
+docker compose up -d --scale web=3 --scale worker=5
 ```
 
 ### Scaling Example
@@ -461,7 +462,7 @@ services:
       DATABASE_URL: postgres://localhost:5432/db
 ```
 
-#### 2. From .env file
+#### 2. From `.env` file
 
 ```yaml
 services:
@@ -481,7 +482,7 @@ services:
       - API_KEY=${API_KEY}
 ```
 
-### .env File Example
+### `.env` File Example
 
 Create a `.env` file in the same directory as `docker-compose.yml`:
 
@@ -586,7 +587,7 @@ services:
       start_period: 30s
 ```
 
-### depends_on with Conditions
+### `depends_on` with Conditions
 
 ```yaml
 services:
@@ -685,16 +686,16 @@ services:
 EOF
 
 # Start the application
-docker-compose up -d
+docker compose up -d
 
 # Test
 curl http://localhost:8080
 
 # View logs
-docker-compose logs
+docker compose logs
 
 # Stop
-docker-compose down
+docker compose down
 ```
 
 </details>
@@ -821,14 +822,14 @@ if __name__ == '__main__':
 
 ```bash
 # Start
-docker-compose up -d --build
+docker compose up -d --build
 
 # Test
 curl http://localhost:8080
 curl http://localhost:5000/count
 
 # Stop
-docker-compose down -v
+docker compose down -v
 ```
 
 </details>
@@ -900,20 +901,20 @@ volumes:
 
 ```bash
 # Start with .env file
-docker-compose up -d
+docker compose up -d
 
 # Override at runtime
-APP_PORT=9090 docker-compose up -d
+APP_PORT=9090 docker compose up -d
 
 # Check configuration
-docker-compose config
+docker compose config
 
 # Access Adminer
 # http://localhost:8080
 # Server: db, User: appuser, Password: appsecret
 
 # Stop
-docker-compose down -v
+docker compose down -v
 ```
 
 </details>
@@ -994,22 +995,22 @@ http {
 
 ```bash
 # Start with 3 web instances
-docker-compose up -d --scale web=3
+docker compose up -d --scale web=3
 
 # Check running containers
-docker-compose ps
+docker compose ps
 
 # Test load balancing
 for i in {1..6}; do curl -s http://localhost:8080; done
 
 # Scale up
-docker-compose up -d --scale web=5
+docker compose up -d --scale web=5
 
 # Scale down
-docker-compose up -d --scale web=2
+docker compose up -d --scale web=2
 
 # Stop
-docker-compose down
+docker compose down
 ```
 
 </details>
@@ -1125,16 +1126,16 @@ if __name__ == '__main__':
 
 ```bash
 # Start and watch startup order
-docker-compose up
+docker compose up
 
 # In another terminal, watch health status
-watch docker-compose ps
+watch docker compose ps
 
 # Check service health
 docker inspect compose-health-api-1 --format='{{json .State.Health}}' | jq
 
 # Stop
-docker-compose down -v
+docker compose down -v
 ```
 
 </details>
@@ -1166,22 +1167,22 @@ examples/
 
 | Command                           | Description                |
 | --------------------------------- | -------------------------- |
-| `docker-compose up`               | Create and start services  |
-| `docker-compose up -d`            | Start in detached mode     |
-| `docker-compose up --build`       | Rebuild images             |
-| `docker-compose down`             | Stop and remove containers |
-| `docker-compose down -v`          | Also remove volumes        |
-| `docker-compose ps`               | List services              |
-| `docker-compose logs`             | View logs                  |
-| `docker-compose logs -f`          | Follow logs                |
-| `docker-compose exec <svc> <cmd>` | Execute command            |
-| `docker-compose run <svc> <cmd>`  | Run one-off command        |
-| `docker-compose build`            | Build images               |
-| `docker-compose pull`             | Pull images                |
-| `docker-compose restart`          | Restart services           |
-| `docker-compose stop`             | Stop services              |
-| `docker-compose config`           | Validate and view config   |
-| `docker-compose up --scale web=3` | Scale service              |
+| `docker compose up`               | Create and start services  |
+| `docker compose up -d`            | Start in detached mode     |
+| `docker compose up --build`       | Rebuild images             |
+| `docker compose down`             | Stop and remove containers |
+| `docker compose down -v`          | Also remove volumes        |
+| `docker compose ps`               | List services              |
+| `docker compose logs`             | View logs                  |
+| `docker compose logs -f`          | Follow logs                |
+| `docker compose exec <svc> <cmd>` | Execute command            |
+| `docker compose run <svc> <cmd>`  | Run one-off command        |
+| `docker compose build`            | Build images               |
+| `docker compose pull`             | Pull images                |
+| `docker compose restart`          | Restart services           |
+| `docker compose stop`             | Stop services              |
+| `docker compose config`           | Validate and view config   |
+| `docker compose up --scale web=3` | Scale service              |
 
 ## ✅ Checklist
 
@@ -1196,6 +1197,6 @@ Before completing this course, make sure you can:
 - [ ] Manage compose applications (start, stop, logs)
 - [ ] Debug compose applications
 
----
+⬅️ **Previous:** [Docker Storage](../06-docker-storage/README.md)
 
-⬅️ **Previous:** [Networking with Docker](../05-networking-with-docker/README.md)
+➡️ **Next:** [Docker Swarm](../08-docker-swarm/README.md)

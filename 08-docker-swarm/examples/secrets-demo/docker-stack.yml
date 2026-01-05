@@ -1,0 +1,112 @@
+# ============================================
+# Secrets Management Demo
+# ============================================
+# Demonstrates secure secret handling in Swarm.
+#
+# Setup:
+#   1. Create secrets first (see README.md)
+#   2. Deploy: docker stack deploy -c docker-stack.yml secretsdemo
+# ============================================
+
+version: "3.8"
+
+services:
+  # --------------------------------------------
+  # Database with Secret Password
+  # --------------------------------------------
+  db:
+    image: mariadb:latest
+    networks:
+      - backend
+    deploy:
+      replicas: 1
+      placement:
+        constraints:
+          - node.role == manager
+    secrets:
+      - db_root_password
+      - db_password
+    environment:
+      MARIADB_ROOT_PASSWORD_FILE: /run/secrets/db_root_password
+      MARIADB_DATABASE: myapp
+      MARIADB_USER: appuser
+      MARIADB_PASSWORD_FILE: /run/secrets/db_password
+    volumes:
+      - db-data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "healthcheck.sh", "--connect", "--innodb_initialized"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 60s
+
+  # --------------------------------------------
+  # Application with Multiple Secrets
+  # --------------------------------------------
+  app:
+    image: alpine:3.18
+    networks:
+      - backend
+    deploy:
+      replicas: 2
+    secrets:
+      - db_password
+      - source: api_key
+        target: /app/secrets/api.key
+        mode: 0400
+    command: |
+      sh -c '
+        echo "=== Secrets Demo ==="
+        echo ""
+        echo "DB Password (from /run/secrets/db_password):"
+        cat /run/secrets/db_password
+        echo ""
+        echo ""
+        echo "API Key (from /app/secrets/api.key):"
+        cat /app/secrets/api.key
+        echo ""
+        echo ""
+        echo "Secrets are stored in memory (tmpfs), never on disk!"
+        echo ""
+        sleep 3600
+      '
+    depends_on:
+      - db
+
+  # --------------------------------------------
+  # Adminer (DB Admin UI)
+  # --------------------------------------------
+  adminer:
+    image: adminer:latest
+    ports:
+      - "8080:8080"
+    networks:
+      - backend
+    deploy:
+      replicas: 1
+    environment:
+      ADMINER_DEFAULT_SERVER: db
+
+# --------------------------------------------
+# Networks
+# --------------------------------------------
+networks:
+  backend:
+    driver: overlay
+
+# --------------------------------------------
+# Volumes
+# --------------------------------------------
+volumes:
+  db-data:
+
+# --------------------------------------------
+# Secrets (must be created before deployment)
+# --------------------------------------------
+secrets:
+  db_root_password:
+    external: true
+  db_password:
+    external: true
+  api_key:
+    external: true

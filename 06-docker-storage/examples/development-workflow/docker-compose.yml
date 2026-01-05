@@ -1,0 +1,67 @@
+# ============================================
+# Development Workflow with Bind Mounts
+# ============================================
+# This example shows how to use bind mounts
+# for a seamless development experience with
+# live code reloading.
+#
+# Usage:
+#   docker compose up -d
+#   # Edit files locally, see changes instantly!
+# ============================================
+
+services:
+  # --------------------------------------------
+  # Frontend (React/Vue/HTML with live reload)
+  # --------------------------------------------
+  frontend:
+    image: nginx:alpine
+    container_name: dev-frontend
+    ports:
+      - "3000:80"
+    volumes:
+      # Bind mount for live HTML/CSS/JS updates
+      - ./frontend:/usr/share/nginx/html:ro
+      # Custom nginx config for development
+      - ./nginx/dev.conf:/etc/nginx/conf.d/default.conf:ro
+    depends_on:
+      - api
+
+  # --------------------------------------------
+  # Backend API (Python Flask with hot reload)
+  # --------------------------------------------
+  api:
+    image: python:3.11-slim
+    container_name: dev-api
+    working_dir: /app
+    command: flask run --host=0.0.0.0 --debug
+    ports:
+      - "5000:5000"
+    environment:
+      FLASK_APP: app.py
+      FLASK_DEBUG: "1"
+      DATABASE_URL: redis://cache:6379/0
+    volumes:
+      # Bind mount for live Python code updates
+      # Flask's debug mode will auto-reload on changes
+      - ./backend:/app
+    depends_on:
+      - cache
+
+  # --------------------------------------------
+  # Cache (Redis for development)
+  # --------------------------------------------
+  cache:
+    image: redis:alpine
+    container_name: dev-cache
+    ports:
+      - "6379:6379"
+    volumes:
+      # Named volume for Redis persistence (optional)
+      - cache-data:/data
+
+# --------------------------------------------
+# Volumes
+# --------------------------------------------
+volumes:
+  cache-data:

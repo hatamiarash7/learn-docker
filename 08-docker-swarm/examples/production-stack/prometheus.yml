@@ -1,0 +1,56 @@
+# Prometheus configuration for production stack
+
+global:
+  scrape_interval: 15s
+  evaluation_interval: 15s
+  external_labels:
+    cluster: "production"
+    monitor: "swarm-monitor"
+
+# Alerting configuration (optional)
+# alerting:
+#   alertmanagers:
+#     - static_configs:
+#         - targets:
+#           - alertmanager:9093
+
+# Rule files (optional)
+# rule_files:
+#   - /etc/prometheus/rules/*.yml
+
+# Scrape configurations
+scrape_configs:
+  # Prometheus self-monitoring
+  - job_name: "prometheus"
+    static_configs:
+      - targets: ["localhost:9090"]
+
+  # Node Exporter - System metrics
+  - job_name: "node-exporter"
+    dns_sd_configs:
+      - names:
+          - "tasks.node-exporter"
+        type: "A"
+        port: 9100
+
+  # cAdvisor - Container metrics
+  - job_name: "cadvisor"
+    dns_sd_configs:
+      - names:
+          - "tasks.cadvisor"
+        type: "A"
+        port: 8080
+
+  # Docker Engine metrics (if enabled)
+  # - job_name: 'docker'
+  #   static_configs:
+  #     - targets: ['docker-host:9323']
+
+  # Application metrics (if exposed)
+  # - job_name: 'api'
+  #   dns_sd_configs:
+  #     - names:
+  #         - 'tasks.api'
+  #       type: 'A'
+  #       port: 3000
+  #   metrics_path: '/metrics'

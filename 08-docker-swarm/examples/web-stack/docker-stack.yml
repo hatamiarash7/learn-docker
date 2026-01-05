@@ -1,0 +1,116 @@
+# ============================================
+# Web Application Stack
+# ============================================
+# A simple web stack with Nginx and Redis
+# demonstrating Docker Swarm services.
+#
+# Deploy:
+#   docker stack deploy -c docker-stack.yml webstack
+#
+# Remove:
+#   docker stack rm webstack
+# ============================================
+
+version: "3.8"
+
+services:
+  # --------------------------------------------
+  # Web Server
+  # --------------------------------------------
+  web:
+    image: nginx:alpine
+    ports:
+      - "80:80"
+    networks:
+      - webnet
+    deploy:
+      # Run 3 replicas
+      replicas: 3
+
+      # Update configuration
+      update_config:
+        parallelism: 1 # Update one at a time
+        delay: 10s # Wait 10s between updates
+        failure_action: rollback
+        order: start-first # Start new before stopping old
+
+      # Rollback configuration
+      rollback_config:
+        parallelism: 1
+        delay: 5s
+
+      # Restart policy
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 3
+        window: 120s
+
+      # Resource limits
+      resources:
+        limits:
+          cpus: "0.5"
+          memory: 128M
+        reservations:
+          cpus: "0.25"
+          memory: 64M
+
+    # Health check
+    healthcheck:
+      test: ["CMD", "wget", "-q", "--spider", "http://localhost/"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
+
+  # --------------------------------------------
+  # Redis Cache
+  # --------------------------------------------
+  redis:
+    image: redis:alpine
+    networks:
+      - webnet
+    deploy:
+      replicas: 1
+      placement:
+        constraints:
+          - node.role == manager
+    volumes:
+      - redis-data:/data
+    command: redis-server --appendonly yes
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # --------------------------------------------
+  # Visualizer (Optional - for demo)
+  # --------------------------------------------
+  visualizer:
+    image: dockersamples/visualizer:latest
+    ports:
+      - "8080:8080"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+    networks:
+      - webnet
+    deploy:
+      replicas: 1
+      placement:
+        constraints:
+          - node.role == manager
+
+# --------------------------------------------
+# Networks
+# --------------------------------------------
+networks:
+  webnet:
+    driver: overlay
+    attachable: true
+
+# --------------------------------------------
+# Volumes
+# --------------------------------------------
+volumes:
+  redis-data:

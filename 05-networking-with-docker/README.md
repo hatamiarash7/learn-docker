@@ -38,8 +38,7 @@ Master Docker networking to enable communication between containers and the outs
     - [🎯 Exercise 3: Port Mapping Practice](#-exercise-3-port-mapping-practice)
     - [🎯 Exercise 4: Microservices Networking](#-exercise-4-microservices-networking)
     - [🎯 Exercise 5: Host Network Mode](#-exercise-5-host-network-mode)
-  - [📁 Examples Directory](#-examples-directory)
-  - [📝 Quick Reference](#-quick-reference)
+  - [� Quick Reference](#-quick-reference)
   - [✅ Checklist](#-checklist)
 
 ## Docker Networking Basics
@@ -129,8 +128,8 @@ docker run -d --name web1 nginx:alpine
 docker run -d --name web2 nginx:alpine
 
 # Check their IPs
-docker inspect web1 --format='{{.NetworkSettings.IPAddress}}'
-docker inspect web2 --format='{{.NetworkSettings.IPAddress}}'
+docker inspect web1 --format='{{.NetworkSettings.Networks.bridge.IPAddress}}'
+docker inspect web2 --format='{{.NetworkSettings.Networks.bridge.IPAddress}}'
 
 # Containers can reach each other by IP
 docker exec web1 ping -c 2 172.17.0.3
@@ -163,7 +162,7 @@ docker run -d --name nginx-host --network host nginx:alpine
 curl http://localhost:80
 
 # Check - no IP assigned (uses host's)
-docker inspect nginx-host --format='{{.NetworkSettings.IPAddress}}'
+docker inspect nginx-host --format='{{.NetworkSettings.Networks.host.IPAddress}}'
 
 # Cleanup
 docker rm -f nginx-host
@@ -189,7 +188,7 @@ Container has no network connectivity.
 docker run -d --name isolated --network none alpine sleep 3600
 
 # Container has no network interface (except loopback)
-docker exec isolated ip addr
+docker exec isolated ip a
 
 # Cannot reach anything
 docker exec isolated ping -c 2 8.8.8.8  # Fails
@@ -221,8 +220,8 @@ docker network create my-network
 # Create with specific subnet
 docker network create \
     --driver bridge \
-    --subnet 192.168.100.0/24 \
-    --gateway 192.168.100.1 \
+    --subnet 192.168.200.0/24 \
+    --gateway 192.168.200.1 \
     my-custom-network
 
 # Create with IP range
@@ -345,10 +344,10 @@ docker network rm app-net
 │              └─────────────────────────────┘                │
 │                        │      │      │                      │
 │                        ▼      ▼      ▼                      │
-│    ┌───────────┐ ┌───────────┐ ┌───────────┐                │
-│    │ Container │ │ Container │ │ Container │                │
-│    │  :80      │ │  :80      │ │  :3000    │                │
-│    └───────────┘ └───────────┘ └───────────┘                │
+│          ┌───────────┐ ┌───────────┐ ┌───────────┐          │
+│          │ Container │ │ Container │ │ Container │          │
+│          │  :80      │ │  :80      │ │  :3000    │          │
+│          └───────────┘ └───────────┘ └───────────┘          │
 │                                                             │
 └─────────────────────────────────────────────────────────────┘
 ```
@@ -485,8 +484,7 @@ docker run -d \
     --network alias-demo \
     --network-alias db \
     --network-alias database \
-    mariadb:latest \
-    -e MARIADB_ROOT_PASSWORD=secret
+    alpine sleep 2000
 
 # Other containers can reach it by any alias
 docker run --rm --network alias-demo alpine ping -c 2 db
@@ -524,8 +522,8 @@ docker run -d --name net-test1 alpine sleep 3600
 docker run -d --name net-test2 alpine sleep 3600
 
 # Get their IPs
-IP1=$(docker inspect -f '{{.NetworkSettings.IPAddress}}' net-test1)
-IP2=$(docker inspect -f '{{.NetworkSettings.IPAddress}}' net-test2)
+IP1=$(docker inspect -f '{{.NetworkSettings.Networks.bridge.IPAddress}}' net-test1)
+IP2=$(docker inspect -f '{{.NetworkSettings.Networks.bridge.IPAddress}}' net-test2)
 
 echo "Container 1 IP: $IP1"
 echo "Container 2 IP: $IP2"
@@ -709,31 +707,16 @@ docker run -d --name nginx-host --network host nginx:alpine
 curl http://localhost:80
 
 # Check no container IP (uses host)
-docker inspect nginx-host --format='{{.NetworkSettings.IPAddress}}'
+docker inspect nginx-host --format='{{.NetworkSettings.Networks.host.IPAddress}}'
 
 # Compare with bridge mode
 docker run -d --name nginx-bridge -p 8080:80 nginx:alpine
-docker inspect nginx-bridge --format='{{.NetworkSettings.IPAddress}}'
-
+docker inspect nginx-bridge --format='{{.NetworkSettings.Networks.bridge.IPAddress}}'
 # Cleanup
 docker rm -f nginx-host nginx-bridge
 ```
 
 </details>
-
-## 📁 Examples Directory
-
-Check the `examples/` directory for complete networking examples:
-
-```text
-examples/
-├── multi-service/
-│   ├── docker-compose.yml
-│   └── README.md
-└── network-isolation/
-    ├── docker-compose.yml
-    └── README.md
-```
 
 ## 📝 Quick Reference
 
@@ -767,4 +750,4 @@ Before moving to the next section, make sure you can:
 
 ⬅️ **Previous:** [Managing Containers](../04-managing-containers/README.md)
 
-➡️ **Next:** [Docker Compose](../06-docker-compose/README.md)
+➡️ **Next:** [Docker Storage](../06-docker-storage/README.md)
