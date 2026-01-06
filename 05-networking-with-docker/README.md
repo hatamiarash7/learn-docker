@@ -38,7 +38,7 @@ Master Docker networking to enable communication between containers and the outs
     - [🎯 Exercise 3: Port Mapping Practice](#-exercise-3-port-mapping-practice)
     - [🎯 Exercise 4: Microservices Networking](#-exercise-4-microservices-networking)
     - [🎯 Exercise 5: Host Network Mode](#-exercise-5-host-network-mode)
-  - [� Quick Reference](#-quick-reference)
+  - [📝 Quick Reference](#-quick-reference)
   - [✅ Checklist](#-checklist)
 
 ## Docker Networking Basics
