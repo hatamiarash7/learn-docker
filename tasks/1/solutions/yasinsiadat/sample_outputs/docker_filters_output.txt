@@ -1,0 +1,27 @@
+Part 3: Docker ps Filtering Examples
+=====================================
+
+1. Containers with label tier=worker:
+NAMES | IMAGE | STATUS
+worker-2 | cpu-worker:latest | Up 21 seconds
+worker-1 | cpu-worker:latest | Up 31 seconds
+
+2. Containers started recently:
+NAMES | IMAGE | STATUS
+toolbox-1 | toolbox:latest | Up 10 seconds
+worker-2 | cpu-worker:latest | Up 21 seconds
+worker-1 | cpu-worker:latest | Up 31 seconds
+producer-3 | log-producer:stable | Up 42 seconds
+producer-2 | log-producer:stable | Up 53 seconds
+producer-1 | log-producer:stable | Up About a minute
+
+3. Container IDs of log-producer containers:
+437ed61ca383
+c0e93e06c31d
+1da3c6929b31
+
+4. Containers with name matching producer-*:
+NAMES        IMAGE                 STATUS
+producer-3   log-producer:stable   Up 42 seconds
+producer-2   log-producer:stable   Up 53 seconds
+producer-1   log-producer:stable   Up About a minute

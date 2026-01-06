@@ -1,0 +1,24 @@
+UNUSED IMAGES DETECTION
+==================================================
+Total images: 19
+Images in use: 3
+Unused images: 16
+
+==================================================
+Unused Images:
+  log-producer:1.0 -> UNUSED
+  kicbase/stable:v0.0.48 -> UNUSED
+  hashicorp/terraform-mcp-server:latest -> UNUSED
+  molecule_local/geerlingguy/docker-debian12-ansible:latest -> UNUSED
+  geerlingguy/docker-debian12-ansible:latest -> UNUSED
+  manna-front:latest -> UNUSED
+  manna-backend:latest -> UNUSED
+  postgres:17 -> UNUSED
+  postgres:16 -> UNUSED
+  front:latest -> UNUSED
+  nginx:latest -> UNUSED
+  ubuntu:latest -> UNUSED
+  yasin:latest -> UNUSED
+  hello-world:latest -> UNUSED
+  redis:6.2-alpine -> UNUSED
+  mongo:4.4 -> UNUSED

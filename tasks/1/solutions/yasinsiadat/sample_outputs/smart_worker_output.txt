@@ -1,0 +1,10 @@
+Smart Worker Controller
+==================================================
+
+Container: worker-2
+  Uptime: 0.43 minutes
+  STATUS: OK (uptime <= 5 minutes)
+
+Container: worker-1
+  Uptime: 0.61 minutes
+  STATUS: OK (uptime <= 5 minutes)

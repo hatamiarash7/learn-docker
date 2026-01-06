@@ -1,0 +1,18 @@
+FROM alpine:latest
+
+RUN echo '#!/bin/sh' > /worker.sh && \
+    echo 'while true; do' >> /worker.sh && \
+    echo '    count=0' >> /worker.sh && \
+    echo '    while [ $count -lt 50000 ]; do' >> /worker.sh && \
+    echo '        count=$((count + 1))' >> /worker.sh && \
+    echo '    done' >> /worker.sh && \
+    echo '    echo "CPU cycle completed at $(date)"' >> /worker.sh && \
+    echo '    sleep 2' >> /worker.sh && \
+    echo 'done' >> /worker.sh && \
+    chmod +x /worker.sh
+
+LABEL app="cpu-worker"
+LABEL tier="worker"
+LABEL env="training"
+
+CMD ["/worker.sh"]

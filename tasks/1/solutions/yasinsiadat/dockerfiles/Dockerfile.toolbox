@@ -1,0 +1,13 @@
+FROM python:3.13-slim
+
+WORKDIR /opt
+
+COPY info.py .
+
+RUN apt-get update && apt-get install -y curl procps && rm -rf /var/lib/apt/lists/*
+
+LABEL app="toolbox"
+LABEL tier="utility"
+LABEL env="training"
+
+CMD ["sleep", "infinity"]

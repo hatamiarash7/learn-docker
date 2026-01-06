@@ -1,0 +1,9 @@
+Resource Usage Summary
+======================
+NAME         CPU %     MEM %
+toolbox-1    0.00%     0.01%
+worker-2     6.59%     0.00%
+worker-1     20.69%    0.00%
+producer-3   0.22%     0.00%
+producer-2   0.00%     0.00%
+producer-1   0.21%     0.00%

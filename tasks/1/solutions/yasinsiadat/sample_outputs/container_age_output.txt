@@ -1,0 +1,8 @@
+NAME                 | AGE_SECONDS  | IMAGE                     | TIER      
+--------------------------------------------------------------------------------
+producer-1           |           67 | log-producer:stable       | backend   
+producer-2           |           57 | log-producer:stable       | backend   
+producer-3           |           46 | log-producer:stable       | backend   
+worker-1             |           36 | cpu-worker:latest         | worker    
+worker-2             |           25 | cpu-worker:latest         | worker    
+toolbox-1            |           14 | toolbox:latest            | utility   

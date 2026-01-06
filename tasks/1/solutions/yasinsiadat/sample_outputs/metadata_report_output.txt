@@ -1,0 +1,10 @@
+Container Metadata Report
+=========================
+CONTAINER_NAME | IMAGE | app | tier | start_time
+-------------------------------------------------
+toolbox-1 | toolbox:latest | toolbox | utility | 2026-01-04 16:29:55
+worker-2 | cpu-worker:latest | cpu-worker | worker | 2026-01-04 16:29:44
+worker-1 | cpu-worker:latest | cpu-worker | worker | 2026-01-04 16:29:34
+producer-3 | log-producer:stable | log-producer | backend | 2026-01-04 16:29:23
+producer-2 | log-producer:stable | log-producer | backend | 2026-01-04 16:29:12
+producer-1 | log-producer:stable | log-producer | backend | 2026-01-04 16:29:02

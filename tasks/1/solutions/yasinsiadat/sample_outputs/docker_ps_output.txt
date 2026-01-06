@@ -1,0 +1,7 @@
+NAMES        IMAGE                 STATUS          LABELS
+toolbox-1    toolbox:latest        Up 20 minutes   app=toolbox,env=training,tier=utility
+worker-2     cpu-worker:latest     Up 13 seconds   tier=worker,app=cpu-worker,env=training
+worker-1     cpu-worker:latest     Up 2 seconds    app=cpu-worker,env=training,tier=worker
+producer-3   log-producer:stable   Up 20 minutes   app=log-producer,env=training,tier=backend
+producer-2   log-producer:stable   Up 21 minutes   app=log-producer,env=training,tier=backend
+producer-1   log-producer:stable   Up 21 minutes   app=log-producer,env=training,tier=backend

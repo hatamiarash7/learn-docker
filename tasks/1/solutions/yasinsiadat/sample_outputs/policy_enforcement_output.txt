@@ -1,0 +1,4 @@
+Policy Enforcement Script
+=========================
+Checking containers for compliance...
+Policy check completed.
